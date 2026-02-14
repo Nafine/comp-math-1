@@ -14,14 +14,14 @@ type solutionMsg struct {
 
 func readFromFile(filepath string) tea.Cmd {
 	return func() tea.Msg {
-		data, err := matrix.ReadCSV(filepath)
+		_, err := matrix.ReadCSV(filepath)
 
 		if err != nil {
 			return errMsg{err}
 		}
 
-		solution, iterations := matrix.Solve(data)
+		//solution, iterations := matrix.Solve(matrix.EquationSystem{})
 
-		return solutionMsg{solution, iterations}
+		return solutionMsg{}
 	}
 }

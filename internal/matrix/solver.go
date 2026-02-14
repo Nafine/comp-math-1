@@ -1,5 +1,11 @@
 package matrix
 
-func Solve(matrix [][]float64) (solution []float64, iterations int) {
-	return nil, 0
+func Solve(s EquationSystem) (EquationSystemSolution, error) {
+	if err := s.toDiagonalDominant(); err != nil {
+		return EquationSystemSolution{}, err
+	}
+
+	s.transform()
+
+	return EquationSystemSolution{}, nil
 }
