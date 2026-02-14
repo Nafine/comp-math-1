@@ -62,10 +62,10 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 			if msg.Type == tea.KeyRight && cur.Position() == width {
 				m.fCol++
-				if m.fCol >= m.n {
+				if m.fCol >= m.cols {
 					m.fCol = 0
 					m.fRow++
-					if m.fRow >= m.n {
+					if m.fRow >= m.rows {
 						m.fRow = 0
 					}
 				}
@@ -73,23 +73,23 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if msg.Type == tea.KeyLeft && cur.Position() == 0 {
 				m.fCol--
 				if m.fCol < 0 {
-					m.fCol = m.n - 1
+					m.fCol = m.cols - 1
 					m.fRow--
 					if m.fRow < 0 {
-						m.fRow = m.n - 1
+						m.fRow = m.rows - 1
 					}
 				}
 			}
 			if msg.Type == tea.KeyDown {
 				m.fRow++
-				if m.fRow >= m.n {
+				if m.fRow >= m.rows {
 					m.fRow = 0
 				}
 			}
 			if msg.Type == tea.KeyUp {
 				m.fRow--
 				if m.fRow < 0 {
-					m.fRow = m.n - 1
+					m.fRow = m.rows - 1
 				}
 			}
 
@@ -134,12 +134,13 @@ func (m *Model) syncSettings() error {
 		return m.inputs[eps].Err
 	}
 	valN, _ := strconv.Atoi(m.inputs[n].Value())
-	m.n = valN
+	m.rows = valN
+	m.cols = valN + 1
 
-	m.matrix = make([][]textinput.Model, m.n)
-	for r := 0; r < m.n; r++ {
-		m.matrix[r] = make([]textinput.Model, m.n+1)
-		for c := 0; c <= m.n; c++ {
+	m.matrix = make([][]textinput.Model, m.rows)
+	for r := 0; r < m.rows; r++ {
+		m.matrix[r] = make([]textinput.Model, m.cols)
+		for c := 0; c < m.cols; c++ {
 			ti := textinput.New()
 			ti.Prompt = ""
 			ti.Width = 8

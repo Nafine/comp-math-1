@@ -28,7 +28,7 @@ type Model struct {
 	focused int
 
 	matrix     [][]textinput.Model
-	n          int
+	rows, cols int
 	fRow, fCol int
 
 	solution   []float64
@@ -83,6 +83,7 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	if m.currentPhase == phaseSettings {
 		return m.updateSettings(msg)
 	}
+
 	return m.updateMatrix(msg)
 }
 
