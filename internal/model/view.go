@@ -6,7 +6,7 @@ import (
 )
 
 func (m Model) renderSettings() string {
-	s := fmt.Sprintf(
+	return fmt.Sprintf(
 		`
 %s
 %s
@@ -19,23 +19,47 @@ func (m Model) renderSettings() string {
 		inputStyle.Width(7).Render("Epsilon"),
 		m.inputs[eps].View(),
 	)
-
-	return s
 }
 
 func (m Model) renderMatrix() string {
 	var b strings.Builder
-	b.WriteString("Fill up the matrix:\n\n")
+	b.WriteString("Fill up the extendedMatrix:\n\n")
 
 	for r := 0; r < m.rows; r++ {
 		for c := 0; c < m.cols-1; c++ {
-			cellContent := m.matrix[r][c].View()
+			cellContent := m.extendedMatrix[r][c].View()
 			b.WriteString(cellStyle.Render(cellContent))
 		}
 		//Free terms of an equation
 		b.WriteString(" | ")
-		b.WriteString(cellStyle.Render(m.matrix[r][m.cols-1].View()))
+		b.WriteString(cellStyle.Render(m.extendedMatrix[r][m.cols-1].View()))
 		b.WriteString("\n")
 	}
 	return b.String()
+}
+
+func (m Model) renderSolution() string {
+	return fmt.Sprintf(
+		`
+%s
+%f
+
+%s
+%f
+
+%s
+%d
+
+%s
+%f
+`,
+		inputStyle.Width(11).Render("Matrix norm"),
+		m.solution.MatrixNorm,
+		inputStyle.Width(15).Render("Solution vector"),
+		m.solution.SolutionVector,
+		inputStyle.Width(10).Render("Iterations"),
+		m.solution.Iterations,
+		inputStyle.Width(12).Render("Final margin"),
+		m.solution.FinalMargin,
+	)
 }

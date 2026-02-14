@@ -20,7 +20,7 @@ func readFromFile(filepath string) tea.Cmd {
 			return errMsg{err}
 		}
 
-		//solution, iterations := matrix.Solve(matrix.EquationSystem{})
+		//solution, iterations := extendedMatrix.Solve(extendedMatrix.EquationSystem{})
 
 		return solutionMsg{}
 	}

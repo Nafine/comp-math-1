@@ -3,15 +3,13 @@ package model
 import (
 	"strconv"
 
+	"github.com/Nafine/comp-math-1/internal/matrix"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
 func (m Model) updateSettings(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-	case solutionMsg:
-		m.solution = msg.solution
-		return m, tea.Quit
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyEnter:
@@ -53,9 +51,9 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyUp, tea.KeyDown, tea.KeyLeft, tea.KeyRight:
-			m.matrix[m.fRow][m.fCol].Blur()
+			m.extendedMatrix[m.fRow][m.fCol].Blur()
 
-			cur := m.matrix[m.fRow][m.fCol]
+			cur := m.extendedMatrix[m.fRow][m.fCol]
 			width := len(cur.Value())
 
 			oldR, oldC := m.fRow, m.fCol
@@ -93,25 +91,42 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 
-			m.matrix[m.fRow][m.fCol].Focus()
+			m.extendedMatrix[m.fRow][m.fCol].Focus()
 
 			if oldR != m.fRow || oldC != m.fCol {
 				if msg.Type == tea.KeyRight {
-					m.matrix[m.fRow][m.fCol].SetCursor(0)
+					m.extendedMatrix[m.fRow][m.fCol].SetCursor(0)
 				}
 				if msg.Type == tea.KeyLeft {
-					m.matrix[m.fRow][m.fCol].SetCursor(len(m.matrix[m.fRow][m.fCol].Value()))
+					m.extendedMatrix[m.fRow][m.fCol].SetCursor(len(m.extendedMatrix[m.fRow][m.fCol].Value()))
 				}
 
 				return m, nil
 			}
 		case tea.KeyEnter:
+			err := m.syncMatrix()
+			if err != nil {
+				m.err = err
+			} else {
+				m.err = nil
+			}
 			m.currentPhase = phaseSolution
 		}
 	}
 
-	m.matrix[m.fRow][m.fCol], cmd = m.matrix[m.fRow][m.fCol].Update(msg)
+	m.extendedMatrix[m.fRow][m.fCol], cmd = m.extendedMatrix[m.fRow][m.fCol].Update(msg)
 	return m, cmd
+}
+
+func (m Model) updateSolution(msg tea.Msg) (tea.Model, tea.Cmd) {
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.Type {
+		case tea.KeyEnter:
+			return m, tea.Quit
+		}
+	}
+	return m, nil
 }
 
 func (m *Model) nextInput() {
@@ -137,24 +152,65 @@ func (m *Model) syncSettings() error {
 	m.rows = valN
 	m.cols = valN + 1
 
-	m.matrix = make([][]textinput.Model, m.rows)
+	m.extendedMatrix = make([][]textinput.Model, m.rows)
 	for r := 0; r < m.rows; r++ {
-		m.matrix[r] = make([]textinput.Model, m.cols)
+		m.extendedMatrix[r] = make([]textinput.Model, m.cols)
 		for c := 0; c < m.cols; c++ {
 			ti := textinput.New()
 			ti.Prompt = ""
 			ti.Width = 8
 			ti.Placeholder = "0"
 			ti.Validate = matrixCellValidator
-			m.matrix[r][c] = ti
+			m.extendedMatrix[r][c] = ti
 		}
 	}
-	m.matrix[0][0].Focus()
+	m.extendedMatrix[0][0].Focus()
 	m.fRow, m.fCol = 0, 0
 	return nil
 }
 
 func (m *Model) syncMatrix() error {
-	//TODO
+	coeffMatrix := make([][]float64, m.rows)
+	freeTerms := make([]float64, m.rows)
+	errorMargin, err := strconv.ParseFloat(m.inputs[eps].Value(), 64)
+
+	if err != nil {
+		return err
+	}
+
+	for i, row := range m.extendedMatrix {
+		coeffMatrix[i] = make([]float64, m.rows)
+		for j := 0; j < m.cols-1; j++ {
+			val, err := strconv.ParseFloat(row[j].Value(), 64)
+
+			if err != nil {
+				return err
+			}
+
+			coeffMatrix[i][j] = val
+		}
+
+		freeTerm, err := strconv.ParseFloat(row[m.cols-1].Value(), 64)
+
+		if err != nil {
+			return err
+		}
+
+		freeTerms[i] = freeTerm
+	}
+
+	eqSystem := matrix.EquationSystem{
+		ErrorMargin: errorMargin,
+		Matrix:      coeffMatrix,
+		FreeTerms:   freeTerms,
+	}
+
+	solutionSystem, err := matrix.Solve(&eqSystem)
+	if err != nil {
+		return err
+	}
+
+	m.solution = solutionSystem
+
 	return nil
 }

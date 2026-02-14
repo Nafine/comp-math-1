@@ -10,4 +10,6 @@ type EquationSystemSolution struct {
 	Solved         bool
 	Iterations     int
 	SolutionVector []float64
+	FinalMargin    float64
+	MatrixNorm     float64
 }

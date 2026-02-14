@@ -41,6 +41,8 @@ func (s *EquationSystem) calc() EquationSystemSolution {
 		Solved:         true,
 		Iterations:     iterations,
 		SolutionVector: cur,
+		FinalMargin:    absDelta(prev, cur),
+		MatrixNorm:     s.matrixNorm(),
 	}
 }
 
@@ -56,6 +58,23 @@ func (s *EquationSystem) sum(prev, cur []float64, i int) float64 {
 	}
 
 	return sum
+}
+
+func (s *EquationSystem) matrixNorm() float64 {
+	matrixNorm := 0.0
+	rowSum := 0.0
+	for i := 0; i < len(s.Matrix); i++ {
+		for j := 0; j < len(s.Matrix[i]); j++ {
+			rowSum += math.Abs(s.Matrix[i][j])
+		}
+
+		if rowSum > matrixNorm {
+			matrixNorm = rowSum
+		}
+
+		rowSum = 0
+	}
+	return matrixNorm
 }
 
 func absDelta(prev, cur []float64) float64 {

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/Nafine/comp-math-1/internal/matrix"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -27,13 +28,12 @@ type Model struct {
 	inputs  []textinput.Model
 	focused int
 
-	matrix     [][]textinput.Model
-	rows, cols int
-	fRow, fCol int
+	extendedMatrix [][]textinput.Model
+	rows, cols     int
+	fRow, fCol     int
 
-	solution   []float64
-	iterations int
-	err        error
+	solution matrix.EquationSystemSolution
+	err      error
 }
 
 func InitModel() Model {
@@ -82,6 +82,8 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	if m.currentPhase == phaseSettings {
 		return m.updateSettings(msg)
+	} else if m.currentPhase == phaseSolution {
+		return m.updateSolution(msg)
 	}
 
 	return m.updateMatrix(msg)
@@ -92,12 +94,15 @@ func (m Model) View() string {
 
 	if m.currentPhase == phaseSettings {
 		s = m.renderSettings()
-	} else {
+	} else if m.currentPhase == phaseMatrix {
 		s = m.renderMatrix()
+	} else {
+		s = m.renderSolution()
 	}
 
 	if m.err != nil {
 		s += errorStyle.Render(fmt.Sprintf("\n\nError: %s\n", m.err.Error()))
 	}
+
 	return s
 }
