@@ -12,10 +12,11 @@ func (s *EquationSystem) transform() {
 			if i != j {
 				s.Matrix[i][j] *= -1
 				s.Matrix[i][j] /= term
-				s.FreeTerms[i] /= term
 			} else {
 				s.Matrix[i][j] = 0
 			}
 		}
+
+		s.FreeTerms[i] /= term
 	}
 }
