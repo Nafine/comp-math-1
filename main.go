@@ -1,8 +1,9 @@
 package main
 
 import (
-	"comp-math-1/internal/model"
 	"log"
+
+	"github.com/Nafine/comp-math-1/internal/model"
 
 	tea "github.com/charmbracelet/bubbletea"
 )

@@ -152,3 +152,8 @@ func (m *Model) syncSettings() error {
 	m.fRow, m.fCol = 0, 0
 	return nil
 }
+
+func (m *Model) syncMatrix() error {
+	//TODO
+	return nil
+}

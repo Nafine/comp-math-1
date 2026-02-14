@@ -1,4 +1,4 @@
-module comp-math-1
+module github.com/Nafine/comp-math-1
 
 go 1.25.5
 

@@ -38,18 +38,19 @@ type Model struct {
 
 func InitModel() Model {
 	inputs := make([]textinput.Model, 2)
+
 	inputs[n] = textinput.New()
-	inputs[n].Placeholder = "3"
-	inputs[n].Prompt = "Matrix size: "
 	inputs[n].Focus()
+
+	inputs[n].Placeholder = "3"
 	inputs[n].CharLimit = 2
 	inputs[n].Width = 2
 	inputs[n].Prompt = ""
 	inputs[n].Validate = nValidator
 
 	inputs[eps] = textinput.New()
+
 	inputs[eps].Placeholder = "0.001"
-	inputs[eps].Prompt = "Epsilon: "
 	inputs[eps].CharLimit = 15
 	inputs[eps].Width = 15
 	inputs[eps].Prompt = ""

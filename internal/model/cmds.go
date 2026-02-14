@@ -1,7 +1,7 @@
 package model
 
 import (
-	"comp-math-1/internal/matrix"
+	"github.com/Nafine/comp-math-1/internal/matrix"
 
 	tea "github.com/charmbracelet/bubbletea"
 )
