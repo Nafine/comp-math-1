@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"strconv"
 
 	"github.com/Nafine/comp-math-1/internal/matrix"
@@ -51,9 +52,9 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyUp, tea.KeyDown, tea.KeyLeft, tea.KeyRight:
-			m.extendedMatrix[m.fRow][m.fCol].Blur()
+			m.extMatrixInputs[m.fRow][m.fCol].Blur()
 
-			cur := m.extendedMatrix[m.fRow][m.fCol]
+			cur := m.extMatrixInputs[m.fRow][m.fCol]
 			width := len(cur.Value())
 
 			oldR, oldC := m.fRow, m.fCol
@@ -91,14 +92,14 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 				}
 			}
 
-			m.extendedMatrix[m.fRow][m.fCol].Focus()
+			m.extMatrixInputs[m.fRow][m.fCol].Focus()
 
 			if oldR != m.fRow || oldC != m.fCol {
 				if msg.Type == tea.KeyRight {
-					m.extendedMatrix[m.fRow][m.fCol].SetCursor(0)
+					m.extMatrixInputs[m.fRow][m.fCol].SetCursor(0)
 				}
 				if msg.Type == tea.KeyLeft {
-					m.extendedMatrix[m.fRow][m.fCol].SetCursor(len(m.extendedMatrix[m.fRow][m.fCol].Value()))
+					m.extMatrixInputs[m.fRow][m.fCol].SetCursor(len(m.extMatrixInputs[m.fRow][m.fCol].Value()))
 				}
 
 				return m, nil
@@ -108,13 +109,13 @@ func (m Model) updateMatrix(msg tea.Msg) (tea.Model, tea.Cmd) {
 			if err != nil {
 				m.err = err
 			} else {
+				m.currentPhase = phaseSolution
 				m.err = nil
 			}
-			m.currentPhase = phaseSolution
 		}
 	}
 
-	m.extendedMatrix[m.fRow][m.fCol], cmd = m.extendedMatrix[m.fRow][m.fCol].Update(msg)
+	m.extMatrixInputs[m.fRow][m.fCol], cmd = m.extMatrixInputs[m.fRow][m.fCol].Update(msg)
 	return m, cmd
 }
 
@@ -127,6 +128,10 @@ func (m Model) updateSolution(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	}
 	return m, nil
+}
+
+func (m Model) updateError() (tea.Model, tea.Cmd) {
+	return m, tea.Quit
 }
 
 func (m *Model) nextInput() {
@@ -152,19 +157,19 @@ func (m *Model) syncSettings() error {
 	m.rows = valN
 	m.cols = valN + 1
 
-	m.extendedMatrix = make([][]textinput.Model, m.rows)
+	m.extMatrixInputs = make([][]textinput.Model, m.rows)
 	for r := 0; r < m.rows; r++ {
-		m.extendedMatrix[r] = make([]textinput.Model, m.cols)
+		m.extMatrixInputs[r] = make([]textinput.Model, m.cols)
 		for c := 0; c < m.cols; c++ {
 			ti := textinput.New()
 			ti.Prompt = ""
 			ti.Width = 8
 			ti.Placeholder = "0"
 			ti.Validate = matrixCellValidator
-			m.extendedMatrix[r][c] = ti
+			m.extMatrixInputs[r][c] = ti
 		}
 	}
-	m.extendedMatrix[0][0].Focus()
+	m.extMatrixInputs[0][0].Focus()
 	m.fRow, m.fCol = 0, 0
 	return nil
 }
@@ -178,13 +183,13 @@ func (m *Model) syncMatrix() error {
 		return err
 	}
 
-	for i, row := range m.extendedMatrix {
+	for i, row := range m.extMatrixInputs {
 		coeffMatrix[i] = make([]float64, m.rows)
 		for j := 0; j < m.cols-1; j++ {
 			val, err := strconv.ParseFloat(row[j].Value(), 64)
 
 			if err != nil {
-				return err
+				return fmt.Errorf("invalid cell value: %s", err)
 			}
 
 			coeffMatrix[i][j] = val
@@ -193,7 +198,7 @@ func (m *Model) syncMatrix() error {
 		freeTerm, err := strconv.ParseFloat(row[m.cols-1].Value(), 64)
 
 		if err != nil {
-			return err
+			return fmt.Errorf("invalid free term value: %s", err)
 		}
 
 		freeTerms[i] = freeTerm

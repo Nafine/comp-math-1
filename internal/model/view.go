@@ -23,16 +23,16 @@ func (m Model) renderSettings() string {
 
 func (m Model) renderMatrix() string {
 	var b strings.Builder
-	b.WriteString("Fill up the extendedMatrix:\n\n")
+	b.WriteString("Fill up the extMatrixInputs:\n\n")
 
 	for r := 0; r < m.rows; r++ {
 		for c := 0; c < m.cols-1; c++ {
-			cellContent := m.extendedMatrix[r][c].View()
+			cellContent := m.extMatrixInputs[r][c].View()
 			b.WriteString(cellStyle.Render(cellContent))
 		}
 		//Free terms of an equation
 		b.WriteString(" | ")
-		b.WriteString(cellStyle.Render(m.extendedMatrix[r][m.cols-1].View()))
+		b.WriteString(cellStyle.Render(m.extMatrixInputs[r][m.cols-1].View()))
 		b.WriteString("\n")
 	}
 	return b.String()

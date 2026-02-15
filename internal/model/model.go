@@ -15,6 +15,7 @@ const (
 	phaseSettings phase = iota
 	phaseMatrix
 	phaseSolution
+	phaseError
 )
 
 const (
@@ -28,9 +29,9 @@ type Model struct {
 	inputs  []textinput.Model
 	focused int
 
-	extendedMatrix [][]textinput.Model
-	rows, cols     int
-	fRow, fCol     int
+	extMatrixInputs [][]textinput.Model
+	rows, cols      int
+	fRow, fCol      int
 
 	solution matrix.EquationSystemSolution
 	err      error
@@ -78,15 +79,26 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case tea.KeyCtrlC, tea.KeyEsc:
 			return m, tea.Quit
 		}
+	case matrix.EquationSystemSolution:
+		m.solution = msg
+		m.currentPhase = phaseSolution
+		return m, tea.Quit
+	case errMsg:
+		m.err = msg.err
+		m.currentPhase = phaseError
+		return m, tea.Quit
 	}
 
+	//Когда-нибудь, может быть, я избавлюсь от этого позора 🙏
 	if m.currentPhase == phaseSettings {
 		return m.updateSettings(msg)
+	} else if m.currentPhase == phaseMatrix {
+		return m.updateMatrix(msg)
 	} else if m.currentPhase == phaseSolution {
 		return m.updateSolution(msg)
 	}
 
-	return m.updateMatrix(msg)
+	return m.updateError()
 }
 
 func (m Model) View() string {
@@ -96,7 +108,7 @@ func (m Model) View() string {
 		s = m.renderSettings()
 	} else if m.currentPhase == phaseMatrix {
 		s = m.renderMatrix()
-	} else {
+	} else if m.currentPhase == phaseSolution {
 		s = m.renderSolution()
 	}
 

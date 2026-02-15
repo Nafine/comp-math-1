@@ -1,9 +1,9 @@
 package matrix
 
 type EquationSystem struct {
-	ErrorMargin float64
-	Matrix      [][]float64
-	FreeTerms   []float64
+	ErrorMargin float64     `yaml:"errorMargin" env-required:"true"`
+	Matrix      [][]float64 `yaml:"matrix" env-required:"true"`
+	FreeTerms   []float64   `yaml:"freeTerms" env-required:"true"`
 }
 
 type EquationSystemSolution struct {
