@@ -23,7 +23,7 @@ func (m Model) renderSettings() string {
 
 func (m Model) renderMatrix() string {
 	var b strings.Builder
-	b.WriteString("Fill up the extMatrixInputs:\n\n")
+	b.WriteString("Fill up the extended matrix:\n\n")
 
 	for r := 0; r < m.rows; r++ {
 		for c := 0; c < m.cols-1; c++ {
