@@ -153,7 +153,12 @@ func (m *Model) syncSettings() error {
 	if m.inputs[eps].Err != nil {
 		return m.inputs[eps].Err
 	}
-	valN, _ := strconv.Atoi(m.inputs[n].Value())
+	valN, err := strconv.Atoi(m.inputs[n].Value())
+
+	if err != nil {
+		return fmt.Errorf("matrix size is not initialized")
+	}
+
 	m.rows = valN
 	m.cols = valN + 1
 
