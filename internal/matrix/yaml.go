@@ -16,7 +16,5 @@ func ReadYaml(filepath string, es *EquationSystem) error {
 		return err
 	}
 
-	fmt.Println(es.Matrix, es.FreeTerms, es.ErrorMargin)
-
 	return nil
 }

@@ -42,16 +42,16 @@ func (m Model) renderSolution() string {
 	return fmt.Sprintf(
 		`
 %s
-%f
+%g
 
 %s
-%f
+%g
 
 %s
 %d
 
 %s
-%f
+%g
 `,
 		inputStyle.Width(11).Render("Matrix norm"),
 		m.solution.MatrixNorm,
