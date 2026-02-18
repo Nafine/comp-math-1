@@ -11,10 +11,6 @@ func nValidator(s string) error {
 		return fmt.Errorf("matrix size is too big")
 	}
 
-	if len(s) == 0 || (s[len(s)-1] < '0' || s[len(s)-1] > '9') {
-		return fmt.Errorf("matrix size is invalid")
-	}
-
 	c := strings.ReplaceAll(s, " ", "")
 	n, err := strconv.ParseInt(c, 10, 64)
 
@@ -30,10 +26,6 @@ func nValidator(s string) error {
 }
 
 func epsValidator(s string) error {
-	if len(s) == 0 || (s[len(s)-1] < '0' || s[len(s)-1] > '9') {
-		return fmt.Errorf("eps is invalid")
-	}
-
 	c := strings.ReplaceAll(s, " ", "")
 	eps, err := strconv.ParseFloat(c, 64)
 
@@ -47,10 +39,6 @@ func epsValidator(s string) error {
 }
 
 func matrixCellValidator(s string) error {
-	if len(s) == 0 || (s[len(s)-1] < '0' || s[len(s)-1] > '9') {
-		return fmt.Errorf("extended matrix is invalid")
-	}
-
 	c := strings.ReplaceAll(s, " ", "")
 	_, err := strconv.ParseInt(c, 10, 64)
 
