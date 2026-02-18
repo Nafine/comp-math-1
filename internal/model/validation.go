@@ -27,6 +27,7 @@ func nValidator(s string) error {
 
 func epsValidator(s string) error {
 	c := strings.ReplaceAll(s, " ", "")
+	c = strings.ReplaceAll(c, ",", ".")
 	eps, err := strconv.ParseFloat(c, 64)
 
 	if err != nil {
@@ -40,7 +41,12 @@ func epsValidator(s string) error {
 
 func matrixCellValidator(s string) error {
 	c := strings.ReplaceAll(s, " ", "")
+	c = strings.ReplaceAll(c, ",", ".")
 	_, err := strconv.ParseInt(c, 10, 64)
 
 	return err
+}
+
+func ReplaceComma(s string) string {
+	return strings.ReplaceAll(s, ",", ".")
 }

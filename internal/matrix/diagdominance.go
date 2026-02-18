@@ -6,10 +6,6 @@ import (
 )
 
 func (s *EquationSystem) toDiagonalDominant() error {
-	if s.isDiagonalDominant() {
-		return nil
-	}
-
 	maxIds, err := s.findMaxIds()
 
 	if err != nil {

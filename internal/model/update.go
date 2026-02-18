@@ -2,6 +2,8 @@ package model
 
 import (
 	"fmt"
+	"math"
+	"math/rand/v2"
 	"strconv"
 
 	"github.com/Nafine/comp-math-1/internal/matrix"
@@ -153,7 +155,8 @@ func (m *Model) syncSettings() error {
 	if m.inputs[eps].Err != nil {
 		return m.inputs[eps].Err
 	}
-	valN, err := strconv.Atoi(m.inputs[n].Value())
+
+	valN, err := strconv.Atoi(ReplaceComma(m.inputs[n].Value()))
 
 	if err != nil {
 		return fmt.Errorf("matrix size is not initialized")
@@ -171,18 +174,24 @@ func (m *Model) syncSettings() error {
 			ti.Width = 8
 			ti.Placeholder = "0"
 			ti.Validate = matrixCellValidator
+
+			rounded := math.Round(rand.Float64()*1000) / 1000
+
+			ti.SetValue(strconv.FormatFloat(float64(rand.Int64N(50))+rounded, 'f', -1, 64))
+			ti.SetCursor(0)
 			m.extMatrixInputs[r][c] = ti
 		}
 	}
 	m.extMatrixInputs[0][0].Focus()
 	m.fRow, m.fCol = 0, 0
+
 	return nil
 }
 
 func (m *Model) syncMatrix() error {
 	coeffMatrix := make([][]float64, m.rows)
 	freeTerms := make([]float64, m.rows)
-	errorMargin, err := strconv.ParseFloat(m.inputs[eps].Value(), 64)
+	errorMargin, err := strconv.ParseFloat(ReplaceComma(m.inputs[eps].Value()), 64)
 
 	if err != nil {
 		return err
@@ -191,7 +200,7 @@ func (m *Model) syncMatrix() error {
 	for i, row := range m.extMatrixInputs {
 		coeffMatrix[i] = make([]float64, m.rows)
 		for j := 0; j < m.cols-1; j++ {
-			val, err := strconv.ParseFloat(row[j].Value(), 64)
+			val, err := strconv.ParseFloat(ReplaceComma(row[j].Value()), 64)
 
 			if err != nil {
 				return fmt.Errorf("invalid cell value: %s", err)
@@ -200,7 +209,7 @@ func (m *Model) syncMatrix() error {
 			coeffMatrix[i][j] = val
 		}
 
-		freeTerm, err := strconv.ParseFloat(row[m.cols-1].Value(), 64)
+		freeTerm, err := strconv.ParseFloat(ReplaceComma(row[m.cols-1].Value()), 64)
 
 		if err != nil {
 			return fmt.Errorf("invalid free term value: %s", err)
